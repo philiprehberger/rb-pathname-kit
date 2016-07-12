@@ -27,7 +27,7 @@ gem install philiprehberger-pathname_kit
 ## Usage
 
 ```ruby
-require 'philiprehberger/pathname_kit'
+require "philiprehberger/pathname_kit"
 
 Philiprehberger::PathnameKit.atomic_write('config.yml') do |f|
   f.write('key: value')
