@@ -36,9 +36,9 @@ RSpec.describe Philiprehberger::PathnameKit do
 
     it 'cleans up temp file on error' do
       path = File.join(tmpdir, 'fail.txt')
-      expect {
+      expect do
         described_class.atomic_write(path) { |_f| raise 'boom' }
-      }.to raise_error(RuntimeError, 'boom')
+      end.to raise_error(RuntimeError, 'boom')
       expect(File.exist?(path)).to be false
     end
   end
