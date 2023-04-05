@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'pathname_kit/version'
+require 'digest'
 require 'fileutils'
 require 'tempfile'
 require 'pathname'
@@ -114,6 +115,67 @@ module Philiprehberger
       raise Error, "file not found: #{path}" unless File.exist?(path)
 
       File.readlines(path).size
+    end
+
+    # Copies a file to a destination, creating parent directories as needed.
+    #
+    # @param src [String] source file path
+    # @param dest [String] destination file path
+    # @return [String] destination path
+    # @raise [PathnameKit::Error] if src or dest is nil/empty, or src doesn't exist
+    def self.copy(src, dest)
+      raise Error, 'source path cannot be nil' if src.nil?
+      raise Error, 'source path cannot be empty' if src.to_s.empty?
+      raise Error, 'destination path cannot be nil' if dest.nil?
+      raise Error, 'destination path cannot be empty' if dest.to_s.empty?
+      raise Error, "source file does not exist: #{src}" unless File.exist?(src.to_s)
+
+      dest_str = dest.to_s
+      FileUtils.mkdir_p(File.dirname(dest_str))
+      FileUtils.cp(src.to_s, dest_str)
+      dest_str
+    end
+
+    # Moves a file to a destination, creating parent directories as needed.
+    #
+    # @param src [String] source file path
+    # @param dest [String] destination file path
+    # @return [String] destination path
+    # @raise [PathnameKit::Error] if src or dest is nil/empty, or src doesn't exist
+    def self.move(src, dest)
+      raise Error, 'source path cannot be nil' if src.nil?
+      raise Error, 'source path cannot be empty' if src.to_s.empty?
+      raise Error, 'destination path cannot be nil' if dest.nil?
+      raise Error, 'destination path cannot be empty' if dest.to_s.empty?
+      raise Error, "source file does not exist: #{src}" unless File.exist?(src.to_s)
+
+      dest_str = dest.to_s
+      FileUtils.mkdir_p(File.dirname(dest_str))
+      FileUtils.mv(src.to_s, dest_str)
+      dest_str
+    end
+
+    # Computes a digest checksum of a file.
+    #
+    # @param path [String] file path
+    # @param algorithm [Symbol] :md5, :sha1, :sha256, or :sha512
+    # @return [String] hex digest string
+    # @raise [PathnameKit::Error] if path is nil/empty, file doesn't exist, or algorithm is invalid
+    def self.checksum(path, algorithm: :sha256)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      path_str = path.to_s
+      raise Error, "file does not exist: #{path_str}" unless File.exist?(path_str)
+
+      digest_class = case algorithm
+                     when :md5 then Digest::MD5
+                     when :sha1 then Digest::SHA1
+                     when :sha256 then Digest::SHA256
+                     when :sha512 then Digest::SHA512
+                     else raise Error, "unsupported algorithm: #{algorithm}"
+                     end
+      digest_class.file(path_str).hexdigest
     end
   end
 end
