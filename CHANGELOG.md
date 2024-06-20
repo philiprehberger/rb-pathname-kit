@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-09
+
+### Added
+- `read(path)` for reading file contents with consistent error handling
+- `write(path, content)` for atomic writes with automatic parent directory creation
+- `each_line(path) { |line| }` for streaming a file line by line
+- `size(path)` returning file size in bytes
+- `with_tempdir { |dir| }` for temporary directories with automatic cleanup
+
 ## [0.2.0] - 2026-04-04
 
 ### Added

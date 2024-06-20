@@ -75,6 +75,32 @@ Philiprehberger::PathnameKit.copy("src/config.yml", "backup/config.yml")
 Philiprehberger::PathnameKit.move("tmp/upload.csv", "data/upload.csv")
 ```
 
+### Read and Write
+
+```ruby
+Philiprehberger::PathnameKit.write("config/app.yml", "key: value")
+Philiprehberger::PathnameKit.read("config/app.yml") # => "key: value"
+```
+
+### Streaming Lines and File Size
+
+```ruby
+Philiprehberger::PathnameKit.each_line("logs/app.log") do |line|
+  puts line if line.include?("ERROR")
+end
+
+Philiprehberger::PathnameKit.size("logs/app.log") # => 4096
+```
+
+### Tempdir Helper
+
+```ruby
+Philiprehberger::PathnameKit.with_tempdir do |dir|
+  File.write(File.join(dir, "scratch.txt"), "ephemeral")
+  # directory is removed automatically
+end
+```
+
 ### Checksum
 
 ```ruby
@@ -98,6 +124,11 @@ Philiprehberger::PathnameKit.checksum("data/file.bin", algorithm: :md5)   # MD5
 | `.copy(src, dest)` | Copy file with parent directory creation |
 | `.move(src, dest)` | Move file with parent directory creation |
 | `.checksum(path, algorithm: :sha256)` | Compute file digest (md5, sha1, sha256, sha512) |
+| `.read(path)` | Read a file's contents |
+| `.write(path, content)` | Atomically write content, creating parent directories |
+| `.each_line(path) { \|line\| }` | Stream a file line by line |
+| `.size(path)` | File size in bytes |
+| `.with_tempdir { \|dir\| }` | Yield a temporary directory and clean it up afterward |
 
 ## Development
 
