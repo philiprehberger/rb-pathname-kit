@@ -428,4 +428,169 @@ RSpec.describe Philiprehberger::PathnameKit do
       expect(Dir.exist?(observed)).to be false
     end
   end
+
+  describe '.append' do
+    it 'appends content to an existing file' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'log.txt')
+        File.write(path, 'line1')
+        described_class.append(path, "\nline2")
+        expect(File.read(path)).to eq("line1\nline2")
+      end
+    end
+
+    it 'creates the file if it does not exist' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'new.txt')
+        described_class.append(path, 'hello')
+        expect(File.read(path)).to eq('hello')
+      end
+    end
+
+    it 'creates parent directories' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'a', 'b', 'deep.txt')
+        described_class.append(path, 'deep')
+        expect(File.read(path)).to eq('deep')
+      end
+    end
+
+    it 'returns the path' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'ret.txt')
+        expect(described_class.append(path, 'x')).to eq(path)
+      end
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.append(nil, 'x') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.append('', 'x') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.identical?' do
+    it 'returns true for files with identical contents' do
+      described_class.with_tempdir do |dir|
+        a = File.join(dir, 'a.txt')
+        b = File.join(dir, 'b.txt')
+        File.write(a, 'same')
+        File.write(b, 'same')
+        expect(described_class.identical?(a, b)).to be true
+      end
+    end
+
+    it 'returns false for files with different contents' do
+      described_class.with_tempdir do |dir|
+        a = File.join(dir, 'a.txt')
+        b = File.join(dir, 'b.txt')
+        File.write(a, 'hello')
+        File.write(b, 'world')
+        expect(described_class.identical?(a, b)).to be false
+      end
+    end
+
+    it 'raises for nil first path' do
+      expect { described_class.identical?(nil, '/tmp/x') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for nil second path' do
+      expect { described_class.identical?('/tmp/x', nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for missing file' do
+      described_class.with_tempdir do |dir|
+        a = File.join(dir, 'a.txt')
+        File.write(a, 'x')
+        expect { described_class.identical?(a, '/nonexistent') }
+          .to raise_error(Philiprehberger::PathnameKit::Error)
+      end
+    end
+  end
+
+  describe '.empty?' do
+    it 'returns true for an empty file' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'empty.txt')
+        File.write(path, '')
+        expect(described_class.empty?(path)).to be true
+      end
+    end
+
+    it 'returns false for a non-empty file' do
+      described_class.with_tempdir do |dir|
+        path = File.join(dir, 'data.txt')
+        File.write(path, 'content')
+        expect(described_class.empty?(path)).to be false
+      end
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.empty?(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for missing file' do
+      expect { described_class.empty?('/nonexistent') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.extension' do
+    it 'returns the extension with leading dot' do
+      expect(described_class.extension('/path/to/file.rb')).to eq('.rb')
+    end
+
+    it 'returns empty string for no extension' do
+      expect(described_class.extension('/path/to/Makefile')).to eq('')
+    end
+
+    it 'returns the last extension for multiple dots' do
+      expect(described_class.extension('archive.tar.gz')).to eq('.gz')
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.extension(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.extension('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.expand' do
+    it 'expands a relative path to absolute' do
+      result = described_class.expand('file.txt')
+      expect(result).to start_with('/')
+      expect(result).to end_with('/file.txt')
+    end
+
+    it 'expands tilde to home directory' do
+      result = described_class.expand('~/docs')
+      expect(result).not_to include('~')
+      expect(result).to end_with('/docs')
+    end
+
+    it 'returns absolute path unchanged' do
+      expect(described_class.expand('/usr/local/bin')).to eq('/usr/local/bin')
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.expand(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.expand('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
 end

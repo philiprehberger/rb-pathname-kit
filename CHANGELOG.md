@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-10
+
+### Added
+- `append(path, content)` for appending content with parent directory creation
+- `identical?(path1, path2)` for comparing two files by SHA-256 digest
+- `empty?(path)` for checking if a file is zero bytes
+- `extension(path)` for getting a file's extension
+- `expand(path)` for expanding a path to its absolute form
+
 ## [0.3.0] - 2026-04-09
 
 ### Added

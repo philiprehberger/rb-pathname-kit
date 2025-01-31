@@ -10,8 +10,8 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Pathname extensions for atomic write, safe delete, and common file operations'
   spec.description = 'Pathname utility library providing atomic writes, safe deletes, directory ' \
-                     'creation, glob-based file finding, tempfile helpers, touch, and line counting. ' \
-                     'All operations handle edge cases and cleanup gracefully.'
+                     'creation, glob-based file finding, tempfile helpers, copy, move, checksum, ' \
+                     'append, and file comparison. All operations handle edge cases gracefully.'
   spec.homepage = 'https://philiprehberger.com/open-source-packages/ruby/philiprehberger-pathname_kit'
   spec.license = 'MIT'
 

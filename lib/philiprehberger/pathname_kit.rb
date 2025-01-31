@@ -248,5 +248,76 @@ module Philiprehberger
                      end
       digest_class.file(path_str).hexdigest
     end
+
+    # Append content to a file, creating parent directories if needed.
+    # Creates the file if it does not exist.
+    #
+    # @param path [String] the file path
+    # @param content [String] the content to append
+    # @return [String] the path written
+    # @raise [Error] if path is nil or empty
+    def self.append(path, content)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      path_str = path.to_s
+      ensure_directory(File.dirname(path_str))
+      File.open(path_str, 'a') { |f| f.write(content.to_s) }
+      path_str
+    end
+
+    # Compare two files by SHA-256 digest.
+    #
+    # @param path1 [String] first file path
+    # @param path2 [String] second file path
+    # @return [Boolean] true if files have identical contents
+    # @raise [Error] if either path is nil/empty or does not exist
+    def self.identical?(path1, path2)
+      raise Error, 'first path cannot be nil' if path1.nil?
+      raise Error, 'first path cannot be empty' if path1.to_s.empty?
+      raise Error, 'second path cannot be nil' if path2.nil?
+      raise Error, 'second path cannot be empty' if path2.to_s.empty?
+      raise Error, "file does not exist: #{path1}" unless File.exist?(path1.to_s)
+      raise Error, "file does not exist: #{path2}" unless File.exist?(path2.to_s)
+
+      Digest::SHA256.file(path1.to_s).hexdigest == Digest::SHA256.file(path2.to_s).hexdigest
+    end
+
+    # Check if a file is empty (zero bytes).
+    #
+    # @param path [String] the file path
+    # @return [Boolean] true if the file is empty
+    # @raise [Error] if path is nil/empty or the file does not exist
+    def self.empty?(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, "file not found: #{path}" unless File.exist?(path.to_s)
+
+      File.empty?(path.to_s)
+    end
+
+    # Get the file extension including the leading dot.
+    #
+    # @param path [String] the file path
+    # @return [String] the extension (e.g. ".rb") or empty string
+    # @raise [Error] if path is nil or empty
+    def self.extension(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.extname(path.to_s)
+    end
+
+    # Expand a path to its absolute form with tilde expansion.
+    #
+    # @param path [String] the file path
+    # @return [String] the expanded absolute path
+    # @raise [Error] if path is nil or empty
+    def self.expand(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.expand_path(path.to_s)
+    end
   end
 end
