@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-14
+
+### Added
+- `exists?(path)` for checking if a file or directory exists
+- `directory?(path)` for checking if a path is a directory
+- `basename(path)` for getting the filename component of a path
+- `dirname(path)` for getting the directory component of a path
+- `mtime(path)` for getting the last modification time
+
 ## [0.4.0] - 2026-04-10
 
 ### Added

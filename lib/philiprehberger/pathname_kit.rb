@@ -319,5 +319,66 @@ module Philiprehberger
 
       File.expand_path(path.to_s)
     end
+
+    # Check if a file or directory exists at the given path.
+    #
+    # @param path [String] the file or directory path
+    # @return [Boolean] true if the path exists
+    # @raise [Error] if path is nil or empty
+    def self.exists?(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.exist?(path.to_s)
+    end
+
+    # Check if the given path is a directory.
+    #
+    # @param path [String] the path to check
+    # @return [Boolean] true if the path is a directory
+    # @raise [Error] if path is nil or empty
+    def self.directory?(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.directory?(path.to_s)
+    end
+
+    # Get the filename component of a path (without directory).
+    #
+    # @param path [String] the file path
+    # @return [String] the filename
+    # @raise [Error] if path is nil or empty
+    def self.basename(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.basename(path.to_s)
+    end
+
+    # Get the directory component of a path.
+    #
+    # @param path [String] the file path
+    # @return [String] the directory portion
+    # @raise [Error] if path is nil or empty
+    def self.dirname(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      File.dirname(path.to_s)
+    end
+
+    # Get the last modification time of a file or directory.
+    #
+    # @param path [String] the file or directory path
+    # @return [Time] the modification time
+    # @raise [Error] if path is nil/empty or does not exist
+    def self.mtime(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, "path not found: #{path}" unless File.exist?(path.to_s)
+
+      File.mtime(path.to_s)
+    end
   end
 end
