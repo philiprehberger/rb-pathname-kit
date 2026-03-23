@@ -153,5 +153,86 @@ RSpec.describe Philiprehberger::PathnameKit do
     it 'raises on nil path' do
       expect { described_class.line_count(nil) }.to raise_error(Philiprehberger::PathnameKit::Error)
     end
+
+    it 'raises on empty path' do
+      expect { described_class.line_count('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'counts single line without trailing newline' do
+      path = File.join(tmpdir, 'single.txt')
+      File.write(path, 'hello')
+      expect(described_class.line_count(path)).to eq(1)
+    end
+  end
+
+  describe '.ensure_directory' do
+    it 'raises on empty path' do
+      expect { described_class.ensure_directory('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.safe_delete' do
+    it 'raises on empty path' do
+      expect { described_class.safe_delete('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.find' do
+    it 'raises on empty glob' do
+      expect { described_class.find('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'finds files in nested directories' do
+      nested = File.join(tmpdir, 'sub')
+      FileUtils.mkdir_p(nested)
+      File.write(File.join(nested, 'deep.txt'), '')
+      result = described_class.find(File.join(tmpdir, '**', '*.txt'))
+      expect(result.any? { |f| f.include?('deep.txt') }).to be true
+    end
+
+    it 'returns sorted results' do
+      File.write(File.join(tmpdir, 'z.txt'), '')
+      File.write(File.join(tmpdir, 'a.txt'), '')
+      result = described_class.find(File.join(tmpdir, '*.txt'))
+      expect(result).to eq(result.sort)
+    end
+  end
+
+  describe '.touch' do
+    it 'raises on empty path' do
+      expect { described_class.touch('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'updates mtime on existing file' do
+      path = File.join(tmpdir, 'existing.txt')
+      File.write(path, 'data')
+      old_mtime = File.mtime(path)
+      sleep(0.1)
+      described_class.touch(path)
+      expect(File.mtime(path)).to be >= old_mtime
+    end
+  end
+
+  describe '.atomic_write' do
+    it 'overwrites existing file content' do
+      path = File.join(tmpdir, 'overwrite.txt')
+      File.write(path, 'old')
+      described_class.atomic_write(path) { |f| f.write('new') }
+      expect(File.read(path)).to eq('new')
+    end
+  end
+
+  describe '.tempfile' do
+    it 'uses the given extension' do
+      described_class.tempfile('.json') do |path|
+        expect(path).to end_with('.json')
+      end
+    end
+
+    it 'uses default .tmp extension' do
+      described_class.tempfile do |path|
+        expect(path).to end_with('.tmp')
+      end
+    end
   end
 end
