@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/rb-pathname-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/rb-pathname-kit/actions/workflows/ci.yml)
 [![Gem Version](https://badge.fury.io/rb/philiprehberger-pathname_kit.svg)](https://rubygems.org/gems/philiprehberger-pathname_kit)
 [![License](https://img.shields.io/github/license/philiprehberger/rb-pathname-kit)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Pathname extensions for atomic write, safe delete, and common file operations
 
