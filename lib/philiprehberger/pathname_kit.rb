@@ -70,7 +70,7 @@ module Philiprehberger
       raise Error, 'glob cannot be nil' if glob.nil?
       raise Error, 'glob cannot be empty' if glob.to_s.empty?
 
-      Dir.glob(glob).sort
+      Dir.glob(glob)
     end
 
     # Create a temporary file with a given extension and yield its path.
