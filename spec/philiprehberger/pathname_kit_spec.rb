@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'digest'
 require 'spec_helper'
 
 RSpec.describe Philiprehberger::PathnameKit do
@@ -233,6 +234,111 @@ RSpec.describe Philiprehberger::PathnameKit do
       described_class.tempfile do |path|
         expect(path).to end_with('.tmp')
       end
+    end
+  end
+
+  describe '.copy' do
+    it 'copies a file to the destination' do
+      src = File.join(tmpdir, 'original.txt')
+      dest = File.join(tmpdir, 'copied.txt')
+      File.write(src, 'content')
+      described_class.copy(src, dest)
+      expect(File.read(dest)).to eq('content')
+    end
+
+    it 'creates parent directories' do
+      src = File.join(tmpdir, 'src.txt')
+      dest = File.join(tmpdir, 'deep', 'nested', 'copy.txt')
+      File.write(src, 'data')
+      described_class.copy(src, dest)
+      expect(File.exist?(dest)).to be true
+    end
+
+    it 'returns the destination path' do
+      src = File.join(tmpdir, 'a.txt')
+      dest = File.join(tmpdir, 'b.txt')
+      File.write(src, 'x')
+      expect(described_class.copy(src, dest)).to eq(dest)
+    end
+
+    it 'raises for nil source' do
+      expect { described_class.copy(nil, 'dest') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for missing source' do
+      expect { described_class.copy('/nonexistent', File.join(tmpdir, 'x')) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.move' do
+    it 'moves a file to the destination' do
+      src = File.join(tmpdir, 'original.txt')
+      dest = File.join(tmpdir, 'moved.txt')
+      File.write(src, 'content')
+      described_class.move(src, dest)
+      expect(File.exist?(dest)).to be true
+      expect(File.exist?(src)).to be false
+    end
+
+    it 'creates parent directories' do
+      src = File.join(tmpdir, 'src.txt')
+      dest = File.join(tmpdir, 'deep', 'nested', 'moved.txt')
+      File.write(src, 'data')
+      described_class.move(src, dest)
+      expect(File.exist?(dest)).to be true
+    end
+
+    it 'returns the destination path' do
+      src = File.join(tmpdir, 'a.txt')
+      dest = File.join(tmpdir, 'b.txt')
+      File.write(src, 'x')
+      expect(described_class.move(src, dest)).to eq(dest)
+    end
+
+    it 'raises for nil source' do
+      expect { described_class.move(nil, 'dest') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for missing source' do
+      expect { described_class.move('/nonexistent', File.join(tmpdir, 'x')) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.checksum' do
+    let(:file_path) { File.join(tmpdir, 'checksum.txt') }
+
+    before { File.write(file_path, 'hello world') }
+
+    it 'computes sha256 by default' do
+      result = described_class.checksum(file_path)
+      expect(result).to eq(Digest::SHA256.hexdigest('hello world'))
+    end
+
+    it 'computes md5' do
+      result = described_class.checksum(file_path, algorithm: :md5)
+      expect(result).to eq(Digest::MD5.hexdigest('hello world'))
+    end
+
+    it 'computes sha1' do
+      result = described_class.checksum(file_path, algorithm: :sha1)
+      expect(result).to eq(Digest::SHA1.hexdigest('hello world'))
+    end
+
+    it 'computes sha512' do
+      result = described_class.checksum(file_path, algorithm: :sha512)
+      expect(result).to eq(Digest::SHA512.hexdigest('hello world'))
+    end
+
+    it 'raises for unsupported algorithm' do
+      expect { described_class.checksum(file_path, algorithm: :crc32) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.checksum(nil) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for missing file' do
+      expect { described_class.checksum('/nonexistent') }.to raise_error(Philiprehberger::PathnameKit::Error)
     end
   end
 end

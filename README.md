@@ -66,6 +66,24 @@ Philiprehberger::PathnameKit.tempfile('.csv') do |path|
 end
 ```
 
+### Copy and Move
+
+```ruby
+require "philiprehberger/pathname_kit"
+
+Philiprehberger::PathnameKit.copy("src/config.yml", "backup/config.yml")
+Philiprehberger::PathnameKit.move("tmp/upload.csv", "data/upload.csv")
+```
+
+### Checksum
+
+```ruby
+require "philiprehberger/pathname_kit"
+
+Philiprehberger::PathnameKit.checksum("data/file.bin")                    # SHA-256 (default)
+Philiprehberger::PathnameKit.checksum("data/file.bin", algorithm: :md5)   # MD5
+```
+
 ## API
 
 | Method | Description |
@@ -77,6 +95,9 @@ end
 | `.tempfile(ext) { \|path\| }` | Create a temp file and yield its path |
 | `.touch(path)` | Create or update a file's modification time |
 | `.line_count(path)` | Count the number of lines in a file |
+| `.copy(src, dest)` | Copy file with parent directory creation |
+| `.move(src, dest)` | Move file with parent directory creation |
+| `.checksum(path, algorithm: :sha256)` | Compute file digest (md5, sha1, sha256, sha512) |
 
 ## Development
 
