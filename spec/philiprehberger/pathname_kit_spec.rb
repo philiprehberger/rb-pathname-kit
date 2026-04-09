@@ -341,4 +341,91 @@ RSpec.describe Philiprehberger::PathnameKit do
       expect { described_class.checksum('/nonexistent') }.to raise_error(Philiprehberger::PathnameKit::Error)
     end
   end
+
+  describe '.read' do
+    it 'reads file contents' do
+      path = File.join(tmpdir, 'r.txt')
+      File.write(path, 'hello')
+      expect(described_class.read(path)).to eq('hello')
+    end
+
+    it 'raises for missing file' do
+      expect { described_class.read('/nonexistent/r.txt') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for nil/empty path' do
+      expect { described_class.read(nil) }.to raise_error(Philiprehberger::PathnameKit::Error)
+      expect { described_class.read('') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.write' do
+    it 'writes content atomically and creates parents' do
+      path = File.join(tmpdir, 'nested', 'w.txt')
+      described_class.write(path, 'data')
+      expect(File.read(path)).to eq('data')
+    end
+
+    it 'returns the destination path' do
+      path = File.join(tmpdir, 'w.txt')
+      expect(described_class.write(path, 'x')).to eq(path)
+    end
+
+    it 'raises for nil/empty path' do
+      expect { described_class.write(nil, 'x') }.to raise_error(Philiprehberger::PathnameKit::Error)
+      expect { described_class.write('', 'x') }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.each_line' do
+    it 'yields each line' do
+      path = File.join(tmpdir, 'lines.txt')
+      File.write(path, "a\nb\nc\n")
+      collected = []
+      described_class.each_line(path) { |line| collected << line.chomp }
+      expect(collected).to eq(%w[a b c])
+    end
+
+    it 'raises for missing file' do
+      expect { described_class.each_line('/nonexistent') { |_| } }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.size' do
+    it 'returns the file size in bytes' do
+      path = File.join(tmpdir, 's.txt')
+      File.write(path, 'hello')
+      expect(described_class.size(path)).to eq(5)
+    end
+
+    it 'raises for missing file' do
+      expect { described_class.size('/nonexistent') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.with_tempdir' do
+    it 'yields a directory that exists during the block' do
+      observed = nil
+      described_class.with_tempdir do |dir|
+        observed = dir
+        expect(Dir.exist?(dir)).to be true
+        File.write(File.join(dir, 'a.txt'), 'x')
+      end
+      expect(Dir.exist?(observed)).to be false
+    end
+
+    it 'cleans up on exception' do
+      observed = nil
+      expect do
+        described_class.with_tempdir do |dir|
+          observed = dir
+          raise 'boom'
+        end
+      end.to raise_error(RuntimeError, 'boom')
+      expect(Dir.exist?(observed)).to be false
+    end
+  end
 end

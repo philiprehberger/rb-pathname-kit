@@ -4,6 +4,7 @@ require_relative 'pathname_kit/version'
 require 'digest'
 require 'fileutils'
 require 'tempfile'
+require 'tmpdir'
 require 'pathname'
 
 module Philiprehberger
@@ -153,6 +154,76 @@ module Philiprehberger
       FileUtils.mkdir_p(File.dirname(dest_str))
       FileUtils.mv(src.to_s, dest_str)
       dest_str
+    end
+
+    # Read a file's contents.
+    #
+    # @param path [String] the file path
+    # @return [String]
+    # @raise [Error] if path is nil/empty or the file does not exist
+    def self.read(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, "file not found: #{path}" unless File.exist?(path.to_s)
+
+      File.read(path.to_s)
+    end
+
+    # Atomically write content to a file, creating parent directories as needed.
+    #
+    # @param path [String] the file path
+    # @param content [String] the content to write
+    # @return [String] the path written
+    # @raise [Error] if path is nil/empty
+    def self.write(path, content)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+
+      atomic_write(path.to_s) { |f| f.write(content.to_s) }
+      path.to_s
+    end
+
+    # Stream a file line by line without loading it entirely into memory.
+    #
+    # @param path [String] the file path
+    # @yield [String] each line, including the trailing newline if present
+    # @return [Enumerator] when no block is given
+    # @raise [Error] if path is nil/empty or the file does not exist
+    def self.each_line(path, &block)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, "file not found: #{path}" unless File.exist?(path.to_s)
+
+      return File.foreach(path.to_s).each unless block
+
+      File.foreach(path.to_s, &block)
+    end
+
+    # Get the size of a file in bytes.
+    #
+    # @param path [String] the file path
+    # @return [Integer]
+    # @raise [Error] if path is nil/empty or the file does not exist
+    def self.size(path)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, "file not found: #{path}" unless File.exist?(path.to_s)
+
+      File.size(path.to_s)
+    end
+
+    # Create a temporary directory and yield its path. The directory and all its
+    # contents are removed when the block returns.
+    #
+    # @yield [String] the temporary directory path
+    # @return [Object] the block return value
+    def self.with_tempdir
+      dir = Dir.mktmpdir
+      begin
+        yield dir
+      ensure
+        FileUtils.rm_rf(dir)
+      end
     end
 
     # Computes a digest checksum of a file.
