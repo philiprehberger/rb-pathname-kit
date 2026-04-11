@@ -110,6 +110,26 @@ Philiprehberger::PathnameKit.checksum("data/file.bin")                    # SHA-
 Philiprehberger::PathnameKit.checksum("data/file.bin", algorithm: :md5)   # MD5
 ```
 
+### Append
+
+```ruby
+Philiprehberger::PathnameKit.append("logs/app.log", "new entry\n")
+```
+
+### File Comparison
+
+```ruby
+Philiprehberger::PathnameKit.identical?("file_a.txt", "file_b.txt") # => true or false
+```
+
+### File Inspection
+
+```ruby
+Philiprehberger::PathnameKit.empty?("output.txt")        # => true or false
+Philiprehberger::PathnameKit.extension("archive.tar.gz")  # => ".gz"
+Philiprehberger::PathnameKit.expand("~/docs/notes.md")    # => "/home/user/docs/notes.md"
+```
+
 ## API
 
 | Method | Description |
@@ -129,6 +149,11 @@ Philiprehberger::PathnameKit.checksum("data/file.bin", algorithm: :md5)   # MD5
 | `.each_line(path) { \|line\| }` | Stream a file line by line |
 | `.size(path)` | File size in bytes |
 | `.with_tempdir { \|dir\| }` | Yield a temporary directory and clean it up afterward |
+| `.append(path, content)` | Append content to a file, creating parents if needed |
+| `.identical?(path1, path2)` | Compare two files by SHA-256 digest |
+| `.empty?(path)` | Check if a file is zero bytes |
+| `.extension(path)` | Get the file extension (e.g. `".rb"`) |
+| `.expand(path)` | Expand to absolute path with tilde expansion |
 
 ## Development
 
