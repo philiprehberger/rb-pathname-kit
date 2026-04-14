@@ -593,4 +593,147 @@ RSpec.describe Philiprehberger::PathnameKit do
         .to raise_error(Philiprehberger::PathnameKit::Error)
     end
   end
+
+  describe '.exists?' do
+    it 'returns true for an existing file' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'test.txt')
+        File.write(path, 'hello')
+        expect(described_class.exists?(path)).to be true
+      end
+    end
+
+    it 'returns true for an existing directory' do
+      Dir.mktmpdir do |dir|
+        expect(described_class.exists?(dir)).to be true
+      end
+    end
+
+    it 'returns false for a non-existent path' do
+      expect(described_class.exists?('/tmp/nonexistent_xyz_123')).to be false
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.exists?(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.exists?('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.directory?' do
+    it 'returns true for a directory' do
+      Dir.mktmpdir do |dir|
+        expect(described_class.directory?(dir)).to be true
+      end
+    end
+
+    it 'returns false for a file' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'test.txt')
+        File.write(path, 'hello')
+        expect(described_class.directory?(path)).to be false
+      end
+    end
+
+    it 'returns false for a non-existent path' do
+      expect(described_class.directory?('/tmp/nonexistent_xyz_123')).to be false
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.directory?(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.directory?('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.basename' do
+    it 'returns the filename from a path' do
+      expect(described_class.basename('/usr/local/bin/ruby')).to eq('ruby')
+    end
+
+    it 'returns the filename with extension' do
+      expect(described_class.basename('/path/to/file.txt')).to eq('file.txt')
+    end
+
+    it 'returns the directory name for a trailing slash' do
+      expect(described_class.basename('/path/to/dir/')).to eq('dir')
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.basename(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.basename('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.dirname' do
+    it 'returns the directory portion of a path' do
+      expect(described_class.dirname('/usr/local/bin/ruby')).to eq('/usr/local/bin')
+    end
+
+    it 'returns the parent for a nested path' do
+      expect(described_class.dirname('/path/to/file.txt')).to eq('/path/to')
+    end
+
+    it 'returns / for a root-level file' do
+      expect(described_class.dirname('/file.txt')).to eq('/')
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.dirname(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.dirname('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
+  describe '.mtime' do
+    it 'returns a Time object for an existing file' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'test.txt')
+        File.write(path, 'hello')
+        result = described_class.mtime(path)
+        expect(result).to be_a(Time)
+      end
+    end
+
+    it 'returns a recent time for a newly created file' do
+      Dir.mktmpdir do |dir|
+        path = File.join(dir, 'test.txt')
+        File.write(path, 'hello')
+        result = described_class.mtime(path)
+        expect(result).to be_within(5).of(Time.now)
+      end
+    end
+
+    it 'raises for a non-existent file' do
+      expect { described_class.mtime('/tmp/nonexistent_xyz_123') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.mtime(nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.mtime('') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
 end

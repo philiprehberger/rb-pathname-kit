@@ -130,6 +130,16 @@ Philiprehberger::PathnameKit.extension("archive.tar.gz")  # => ".gz"
 Philiprehberger::PathnameKit.expand("~/docs/notes.md")    # => "/home/user/docs/notes.md"
 ```
 
+### Path Queries
+
+```ruby
+Philiprehberger::PathnameKit.exists?("config/app.yml")         # => true or false
+Philiprehberger::PathnameKit.directory?("config")              # => true or false
+Philiprehberger::PathnameKit.basename("/path/to/file.txt")     # => "file.txt"
+Philiprehberger::PathnameKit.dirname("/path/to/file.txt")      # => "/path/to"
+Philiprehberger::PathnameKit.mtime("config/app.yml")           # => 2026-04-14 12:00:00 +0000
+```
+
 ## API
 
 | Method | Description |
@@ -154,6 +164,11 @@ Philiprehberger::PathnameKit.expand("~/docs/notes.md")    # => "/home/user/docs/
 | `.empty?(path)` | Check if a file is zero bytes |
 | `.extension(path)` | Get the file extension (e.g. `".rb"`) |
 | `.expand(path)` | Expand to absolute path with tilde expansion |
+| `.exists?(path)` | Check if a file or directory exists |
+| `.directory?(path)` | Check if a path is a directory |
+| `.basename(path)` | Get the filename component of a path |
+| `.dirname(path)` | Get the directory component of a path |
+| `.mtime(path)` | Get the last modification time |
 
 ## Development
 
