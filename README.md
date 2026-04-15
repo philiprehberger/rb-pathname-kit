@@ -140,6 +140,13 @@ Philiprehberger::PathnameKit.dirname("/path/to/file.txt")      # => "/path/to"
 Philiprehberger::PathnameKit.mtime("config/app.yml")           # => 2026-04-14 12:00:00 +0000
 ```
 
+### Relative Paths
+
+```ruby
+Philiprehberger::PathnameKit.relative_to("/a/b/c.txt", "/a/b")  # => "c.txt"
+Philiprehberger::PathnameKit.relative_to("/a/foo", "/a/bar")    # => "../foo"
+```
+
 ## API
 
 | Method | Description |
@@ -169,6 +176,7 @@ Philiprehberger::PathnameKit.mtime("config/app.yml")           # => 2026-04-14 1
 | `.basename(path)` | Get the filename component of a path |
 | `.dirname(path)` | Get the directory component of a path |
 | `.mtime(path)` | Get the last modification time |
+| `.relative_to(path, base)` | Express a path relative to a base path |
 
 ## Development
 
