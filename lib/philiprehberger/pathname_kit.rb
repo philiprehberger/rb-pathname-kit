@@ -320,6 +320,25 @@ module Philiprehberger
       File.expand_path(path.to_s)
     end
 
+    # Return +path+ expressed relative to +base+ as a String.
+    #
+    # Both arguments may be String or Pathname. Inputs are wrapped in
+    # Pathname and expanded so relative inputs are resolved against the
+    # current working directory before the relative path is computed.
+    #
+    # @param path [String, Pathname] the target path
+    # @param base [String, Pathname] the base path to compute relativity against
+    # @return [String] the relative path
+    # @raise [Error] if either argument is nil or empty
+    def self.relative_to(path, base)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, 'base cannot be nil' if base.nil?
+      raise Error, 'base cannot be empty' if base.to_s.empty?
+
+      Pathname.new(path.to_s).expand_path.relative_path_from(Pathname.new(base.to_s).expand_path).to_s
+    end
+
     # Check if a file or directory exists at the given path.
     #
     # @param path [String] the file or directory path

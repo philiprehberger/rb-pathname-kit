@@ -702,6 +702,58 @@ RSpec.describe Philiprehberger::PathnameKit do
     end
   end
 
+  describe '.relative_to' do
+    it 'returns the relative path for a sibling directory' do
+      expect(described_class.relative_to('/a/foo', '/a/bar')).to eq('../foo')
+    end
+
+    it 'returns just the subpath for a nested directory' do
+      expect(described_class.relative_to('/a/b/c.txt', '/a/b')).to eq('c.txt')
+    end
+
+    it 'returns "." when path equals base' do
+      expect(described_class.relative_to('/a/b', '/a/b')).to eq('.')
+    end
+
+    it 'accepts Pathname objects' do
+      path = Pathname.new('/a/b/c.txt')
+      base = Pathname.new('/a/b')
+      expect(described_class.relative_to(path, base)).to eq('c.txt')
+    end
+
+    it 'accepts String inputs' do
+      expect(described_class.relative_to('/a/b/c.txt', '/a/b')).to eq('c.txt')
+    end
+
+    it 'handles relative inputs by expanding them' do
+      Dir.chdir(tmpdir) do
+        FileUtils.mkdir_p('a/b')
+        FileUtils.mkdir_p('a/c')
+        expect(described_class.relative_to('a/b', 'a/c')).to eq('../b')
+      end
+    end
+
+    it 'raises for nil path' do
+      expect { described_class.relative_to(nil, '/a') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty path' do
+      expect { described_class.relative_to('', '/a') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for nil base' do
+      expect { described_class.relative_to('/a', nil) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for empty base' do
+      expect { described_class.relative_to('/a', '') }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
   describe '.mtime' do
     it 'returns a Time object for an existing file' do
       Dir.mktmpdir do |dir|

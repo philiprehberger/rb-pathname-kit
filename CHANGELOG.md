@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-15
+
+### Added
+- `relative_to(path, base)` for expressing a path relative to a base path
+
 ## [0.5.0] - 2026-04-14
 
 ### Added
