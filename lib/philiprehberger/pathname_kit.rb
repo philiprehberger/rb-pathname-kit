@@ -118,6 +118,29 @@ module Philiprehberger
       File.readlines(path).size
     end
 
+    # Return the last n lines of a file as an Array.
+    #
+    # Streams the file line by line through a bounded ring of size n so memory
+    # usage stays constant regardless of file size.
+    #
+    # @param path [String] the file path
+    # @param n [Integer] number of trailing lines to return
+    # @return [Array<String>] the last n lines (or fewer if the file is shorter)
+    # @raise [Error] if path is nil/empty, n is non-positive, or the file does not exist
+    def self.tail(path, n = 10)
+      raise Error, 'path cannot be nil' if path.nil?
+      raise Error, 'path cannot be empty' if path.to_s.empty?
+      raise Error, 'n must be positive' unless n.is_a?(Integer) && n.positive?
+      raise Error, "file not found: #{path}" unless File.exist?(path)
+
+      buffer = []
+      File.foreach(path) do |line|
+        buffer << line
+        buffer.shift if buffer.size > n
+      end
+      buffer
+    end
+
     # Copies a file to a destination, creating parent directories as needed.
     #
     # @param src [String] source file path

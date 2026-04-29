@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-28
+
+### Added
+- `tail(path, n = 10)` — return the last `n` lines of a file as an Array. Streams the file through a bounded ring so memory usage stays constant for large files.
+
 ## [0.6.0] - 2026-04-15
 
 ### Added

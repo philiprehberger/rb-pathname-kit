@@ -92,6 +92,16 @@ end
 Philiprehberger::PathnameKit.size("logs/app.log") # => 4096
 ```
 
+### Tail
+
+Read the last `n` lines of a file (defaults to 10). Memory usage is bounded
+regardless of file size:
+
+```ruby
+Philiprehberger::PathnameKit.tail("logs/app.log")        # => last 10 lines
+Philiprehberger::PathnameKit.tail("logs/app.log", 50)    # => last 50 lines
+```
+
 ### Tempdir Helper
 
 ```ruby
@@ -158,6 +168,7 @@ Philiprehberger::PathnameKit.relative_to("/a/foo", "/a/bar")    # => "../foo"
 | `.tempfile(ext) { \|path\| }` | Create a temp file and yield its path |
 | `.touch(path)` | Create or update a file's modification time |
 | `.line_count(path)` | Count the number of lines in a file |
+| `.tail(path, n = 10)` | Return the last n lines of a file as an Array |
 | `.copy(src, dest)` | Copy file with parent directory creation |
 | `.move(src, dest)` | Move file with parent directory creation |
 | `.checksum(path, algorithm: :sha256)` | Compute file digest (md5, sha1, sha256, sha512) |

@@ -166,6 +166,51 @@ RSpec.describe Philiprehberger::PathnameKit do
     end
   end
 
+  describe '.tail' do
+    it 'returns the last n lines of a file' do
+      path = File.join(tmpdir, 'log.txt')
+      File.write(path, (1..100).map { |i| "line-#{i}\n" }.join)
+      expect(described_class.tail(path, 3)).to eq(%W[line-98\n line-99\n line-100\n])
+    end
+
+    it 'defaults to 10 lines' do
+      path = File.join(tmpdir, 'log.txt')
+      File.write(path, (1..50).map { |i| "line-#{i}\n" }.join)
+      result = described_class.tail(path)
+      expect(result.size).to eq(10)
+      expect(result.first).to eq("line-41\n")
+      expect(result.last).to eq("line-50\n")
+    end
+
+    it 'returns the entire file when it has fewer than n lines' do
+      path = File.join(tmpdir, 'short.txt')
+      File.write(path, "a\nb\nc\n")
+      expect(described_class.tail(path, 10)).to eq(%W[a\n b\n c\n])
+    end
+
+    it 'returns an empty array for an empty file' do
+      path = File.join(tmpdir, 'empty.txt')
+      File.write(path, '')
+      expect(described_class.tail(path, 5)).to eq([])
+    end
+
+    it 'raises for non-existent file' do
+      expect { described_class.tail(File.join(tmpdir, 'nope.txt')) }
+        .to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises for non-positive n' do
+      path = File.join(tmpdir, 'log.txt')
+      File.write(path, "x\n")
+      expect { described_class.tail(path, 0) }.to raise_error(Philiprehberger::PathnameKit::Error)
+      expect { described_class.tail(path, -1) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+
+    it 'raises on nil path' do
+      expect { described_class.tail(nil) }.to raise_error(Philiprehberger::PathnameKit::Error)
+    end
+  end
+
   describe '.ensure_directory' do
     it 'raises on empty path' do
       expect { described_class.ensure_directory('') }.to raise_error(Philiprehberger::PathnameKit::Error)
